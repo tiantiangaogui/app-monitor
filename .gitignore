@@ -7,6 +7,12 @@ venv/
 # 运行时下架留痕（不进 git，仅本地排查用）
 down.json
 
+# 本地邮件自检（含 SMTP 密码，绝不提交）
+.env
+.env.local
+test_mail.py
+.env.example
+
 # OS
 .DS_Store
 Thumbs.db
