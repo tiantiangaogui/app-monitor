@@ -4,6 +4,9 @@ __pycache__/
 .venv/
 venv/
 
+# 运行时下架留痕（不进 git，仅本地排查用）
+down.json
+
 # OS
 .DS_Store
 Thumbs.db
