@@ -22,8 +22,10 @@ OUTPUT = os.path.join(BASE_DIR, "data.json")
 CONFIG = os.path.join(BASE_DIR, "apps.json")
 DOWN_FILE = os.path.join(BASE_DIR, "down.json")
 
-# 收件人默认值（未配置 MAIL_TO 环境变量时使用）
-DEFAULT_MAIL_TO = "tanemouse@163.com"
+# 收件人默认值（未配置 MAIL_TO 环境变量时使用）。
+# 注意：请勿在此填写任何真实邮箱——本仓库是 Public，人人可见。
+# 部署时应始终在 GitHub Secrets 里配置 MAIL_TO（会被本值优先覆盖）。
+DEFAULT_MAIL_TO = ""
 
 
 def load_apps():
@@ -139,6 +141,10 @@ def send_mail(subject, body):
     to = (os.environ.get("MAIL_TO", "").strip() or DEFAULT_MAIL_TO).strip()
     if not (host and user and pwd):
         print("[邮件] 未配置 SMTP_HOST/SMTP_USERNAME/SMTP_PASSWORD，跳过邮件通知")
+        return False
+    if not to:
+        # 未配置收件人（MAIL_TO 为空且 DEFAULT_MAIL_TO 为空），无法投递，跳过
+        print("[邮件] 未配置收件人 MAIL_TO，跳过邮件通知")
         return False
     try:
         port = int(port_str)
