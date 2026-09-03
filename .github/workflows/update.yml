@@ -1,9 +1,9 @@
-name: 每日包体状态核验
+name: 包体状态核验（每小时）
 
 on:
   schedule:
-    # 每天 UTC 00:15 运行（北京时间 08:15），错开整点高峰
-    - cron: '15 0 * * *'
+    # 每小时整点运行（GitHub cron 为 UTC 时间，即北京时间每小时整点），全天 24 次
+    - cron: '0 * * * *'
   workflow_dispatch: {}   # 支持在 Actions 页面手动触发一次
 
 permissions:
@@ -21,8 +21,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: 运行状态检测脚本
+      - name: 运行状态检测（含下架邮件通知）
         run: python check_status.py
+        env:
+          # 以下 SMTP 凭证从仓库 Settings -> Secrets and variables -> Actions 读取；
+          # 未配置时脚本会自动跳过邮件发送，任务不会因此失败
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
 
       - name: 提交更新（若数据有变化）
         run: |
@@ -32,7 +40,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "data.json 无变化，跳过提交"
           else
-            git commit -m "chore: 更新包体状态 $(date -u +%F)"
+            git commit -m "chore: 更新包体状态 $(date -u +%F-%H)"
             git push
             echo "已提交并推送最新状态数据"
           fi
