@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App 包体信息监控台</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --ink: #1d1d1f;
+    --ink-2: #6e6e73;
+    --ink-3: #86868b;
+    --line: #e4e6eb;
+    --brand: #0a84ff;
+    --brand-soft: #e8f3ff;
+    --ok: #34c759;
+    --ok-soft: #e7f9ee;
+    --off: #ff3b30;
+    --off-soft: #ffebea;
+    --warn: #ff9500;
+    --warn-soft: #fff3e0;
+    --code-bg: #f0f2f5;
+    --radius: 14px;
+    --mono: "SF Mono", "Cascadia Code", Consolas, "Courier New", monospace;
+    --sans: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 40px 24px 64px; }
+
+  /* ===== 页头 ===== */
+  .masthead {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .masthead .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--brand);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .masthead h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; }
+  .masthead .sub { color: var(--ink-2); font-size: 15px; margin-top: 8px; }
+  .stamp {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .stamp .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex-shrink: 0; }
+  .stamp .dot.paused { background: var(--warn); }
+
+  /* ===== KPI 概览 ===== */
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    margin-bottom: 26px;
+  }
+  .kpi {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .kpi .label { font-size: 13px; color: var(--ink-2); }
+  .kpi .value { font-size: 28px; font-weight: 700; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .kpi .value.ok { color: var(--ok); }
+  .kpi .value.warn { color: var(--warn); }
+  .kpi .value.brand { color: var(--brand); }
+  .kpi .note { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+
+  /* ===== 工具栏 ===== */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .tabs { display: inline-flex; gap: 4px; background: #eceef1; padding: 4px; border-radius: 10px; }
+  .tabs button {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    border: 0;
+    background: transparent;
+    color: var(--ink-2);
+    padding: 7px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tabs button.active { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .tabs button .cnt { font-weight: 700; margin-left: 4px; font-variant-numeric: tabular-nums; }
+
+  .toolbar-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .count-line { font-size: 13px; color: var(--ink-2); }
+  .check-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--brand);
+    color: var(--brand);
+    background: var(--card);
+    border-radius: 9px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .check-btn:hover { background: var(--brand-soft); }
+  .check-btn.loading { opacity: 0.6; cursor: wait; }
+  .check-btn svg { width: 14px; height: 14px; }
+
+  /* ===== App 卡片 ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: #c8d2e0; }
+
+  .card-top { display: flex; align-items: flex-start; gap: 14px; }
+  .card .icon {
+    width: 56px; height: 56px;
+    border-radius: 13px;
+    flex-shrink: 0;
+    background: var(--code-bg);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .card .icon img { width: 100%; height: 100%; border-radius: 13px; display: block; }
+  .card .title-block { min-width: 0; }
+  .card .app-name { font-size: 17px; font-weight: 700; line-height: 1.3; }
+  .card .dev { font-size: 13px; color: var(--ink-2); margin-top: 3px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .badge.online { color: #1a8f3a; background: var(--ok-soft); }
+  .badge.offline { color: #c2271e; background: var(--off-soft); }
+  .badge.unknown { color: #b25700; background: var(--warn-soft); }
+  .badge svg { width: 9px; height: 9px; }
+  .badge.online svg circle.live { animation: pulse 2s infinite; transform-origin: center; }
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.35; }
+    100% { opacity: 1; }
+  }
+
+  .kv { display: flex; flex-direction: column; gap: 9px; }
+  .kv .row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 13px; }
+  .kv .k { color: var(--ink-2); flex-shrink: 0; }
+  .kv .v { text-align: right; color: var(--ink); word-break: break-all; }
+
+  .bundle-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--code-bg);
+    border-radius: 9px;
+    padding: 8px 12px;
+  }
+  .bundle-line .bundle {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: #3a3f47;
+    word-break: break-all;
+    user-select: all;
+  }
+  .copy-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-2);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 7px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .copy-btn:hover { color: var(--brand); border-color: var(--brand); }
+  .copy-btn svg { width: 13px; height: 13px; }
+
+  .card .actions { display: flex; gap: 10px; }
+  .btn-store {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: var(--brand);
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 9px;
+    padding: 9px 0;
+    transition: background 0.15s;
+  }
+  .btn-store:hover { background: #0071e3; }
+  .btn-store svg { width: 14px; height: 14px; }
+
+  /* ===== 明细表 ===== */
+  .table-section { margin-top: 30px; }
+  .table-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .table-section .hint { font-size: 13px; color: var(--ink-2); margin-bottom: 12px; }
+  .table-scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; min-width: 860px; font-size: 13px; }
+  thead th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--ink-2);
+    font-weight: 600;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #fafbfc;
+    white-space: nowrap;
+  }
+  tbody td { padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover { background: #fafbfc; }
+  td .tname { font-weight: 600; }
+  td .mono { font-family: var(--mono); font-size: 12px; color: #3a3f47; }
+  td .st-cell { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+  td .st-cell.online { color: #1a8f3a; }
+  td .st-cell.offline { color: #c2271e; }
+  td .st-cell.unknown { color: #b25700; }
+  td .st-cell svg { width: 9px; height: 9px; }
+  td .link { color: var(--brand); text-decoration: none; font-weight: 600; }
+  td .link:hover { text-decoration: underline; }
+
+  /* ===== 空态 / 模式提示 ===== */
+  .empty {
+    display: none;
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--ink-2);
+    font-size: 14px;
+    background: var(--card);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+  }
+  .empty.show { display: block; }
+
+  .modebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--ink-2);
+    background: var(--brand-soft);
+    border: 1px solid #cfe6ff;
+    border-radius: 10px;
+    padding: 9px 14px;
+    margin-bottom: 16px;
+  }
+  .modebar svg { width: 14px; height: 14px; color: var(--brand); flex-shrink: 0; }
+  .modebar b { color: var(--ink); font-weight: 600; }
+
+  .footer { margin-top: 34px; font-size: 12px; color: var(--ink-3); text-align: center; }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 24px 16px 48px; }
+    .masthead h1 { font-size: 24px; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="3"/><path d="M8 21h8M12 18v3"/></svg>
+        APP STORE 运营监控
+      </div>
+      <h1>App 包体信息监控台</h1>
+      <p class="sub">iOS 在管应用的包体信息与在线状态 · 云端每日自动核验 + 可手动即时刷新</p>
+    </div>
+    <div class="stamp" id="stamp">
+      <span class="dot" id="stamp-dot"></span>
+      <span id="stamp-label">数据加载中…</span>
+    </div>
+  </header>
+
+  <div class="modebar" id="modebar" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+    <span id="modebar-text"></span>
+  </div>
+
+  <section class="kpis" aria-label="概览指标">
+    <div class="kpi">
+      <div class="label">在管 App</div>
+      <div class="value brand" id="kpi-total">–</div>
+      <div class="note">共收录包体</div>
+    </div>
+    <div class="kpi">
+      <div class="label">在线</div>
+      <div class="value ok" id="kpi-online">–</div>
+      <div class="note">商店可下载</div>
+    </div>
+    <div class="kpi">
+      <div class="label">离线 / 下架</div>
+      <div class="value" id="kpi-offline">–</div>
+      <div class="note">商店不可见</div>
+    </div>
+    <div class="kpi">
+      <div class="label">在线率</div>
+      <div class="value brand" id="kpi-rate">–</div>
+      <div class="note" id="kpi-rate-note">等待数据</div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="tabs" role="tablist" aria-label="在线状态筛选">
+      <button data-filter="all" class="active" role="tab">全部<span class="cnt" id="cnt-all"></span></button>
+      <button data-filter="online" role="tab">在线<span class="cnt" id="cnt-online"></span></button>
+      <button data-filter="offline" role="tab">离线<span class="cnt" id="cnt-offline"></span></button>
+    </div>
+    <div class="toolbar-right">
+      <div class="count-line" id="count-line"></div>
+      <button class="check-btn" id="check-now" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+        <span>立即检测</span>
+      </button>
+    </div>
+  </div>
+
+  <section class="grid" id="cards" aria-label="App 列表"></section>
+  <div class="empty" id="empty">当前筛选条件下没有对应的 App</div>
+
+  <section class="table-section">
+    <h2>包体明细</h2>
+    <p class="hint">完整字段对照表，Bundle ID 为 App Store 内唯一包体标识</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>App</th>
+            <th>Bundle ID</th>
+            <th>开发者</th>
+            <th>上架日期</th>
+            <th>当前版本</th>
+            <th>在线状态</th>
+            <th>商店</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="footer" id="footer-note"></p>
+</div>
+
+<script>
+  // ===== 兜底数据（无 data.json 时的本地模式） =====
+  var FALLBACK_APPS = [
+    {name:"Coiffures", developer:"DERICK PALMES", bundleId:"com.coiffures", releaseDate:"2026-08-04", version:"1.0.1", url:"https://apps.apple.com/us/app/coiffures/id6793454542", icon:"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/3f/88/b8/3f88b851-9338-3ff4-5bcd-80b3ac354847/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg", status:"online"},
+    {name:"RoamCamp", developer:"Emine Ak", bundleId:"com.roamcamp", releaseDate:"2026-08-24", version:"1.1.0", url:"https://apps.apple.com/hk/app/roamcamp/id6802578049", icon:"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/03/27/8f/03278fc7-0b3e-96eb-82e2-bba74ac52298/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg", status:"online"},
+    {name:"Anniversary Tracker Memories", developer:"LEVAZ HOLLINGWORTH", bundleId:"com.appAnniversaryTracker", releaseDate:"2026-08-24", version:"1.0.0", url:"https://apps.apple.com/us/app/anniversary-tracker-memories/id6796228189", icon:"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/bd/a3/3d/bda33dfb-2c86-fbdf-bdde-67462cc6aa3d/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg", status:"online"},
+    {name:"DropIt. Quit Bad Habits", developer:"KUNNAR KALLASTE", bundleId:"com.dropitapp", releaseDate:"2026-08-27", version:"1.0.0", url:"https://apps.apple.com/us/app/dropit-quit-bad-habits/id6795485506", icon:"https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8e/aa/68/8eaa689d-cb91-6158-6df1-626b70987c7e/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg", status:"online"},
+    {name:"Flavor Alchemy", developer:"TAMBET MALK", bundleId:"com.littleMain.justListC", releaseDate:"2026-08-28", version:"1.0", url:"https://apps.apple.com/us/app/flavor-alchemy/id6804640838", icon:"https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/bd/54/43/bd5443de-ffd0-6ad2-544e-64cc8361c2f0/AppIcon-1x_U007emarketing-0-8-0-85-220-0.png/256x256bb.jpg", status:"online"},
+    {name:"FutureMe: Time Capsule", developer:"Ruchika Daswal", bundleId:"com.futureme2026", releaseDate:"2026-06-10", version:"1.2.0", url:"https://apps.apple.com/us/app/futureme-time-capsule/id6776085961", icon:"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/4d/6a/cf/4d6acf1f-cd81-b38e-5031-8ed6bf5826cc/AppIcon-1x_U007ephone-0-11-0-85-220-0.png/256x256bb.jpg", status:"online"},
+    {name:"Nailory", developer:"Alok Mundy", bundleId:"com.manicures2026", releaseDate:"2026-07-06", version:"1.1.0", url:"https://apps.apple.com/us/app/nailory/id6772021868", icon:"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5e/a5/34/5ea534fe-197f-d9a7-c4ba-e79b2d8d6b95/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg", status:"online"}
+  ];
+
+  var CURRENT = { apps: [], checked_at: null, source: "fallback" };
+  var filter = "all";
+
+  var ONLINE_ICON = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#34c759" class="live"/></svg>';
+  var OFFLINE_ICON = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#ff3b30"/></svg>';
+  var UNKNOWN_ICON = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#ff9500"/></svg>';
+
+  function fmtTime(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    var p = function (n) { return (n < 10 ? "0" : "") + n; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+
+  function regionOf(url) {
+    var m = /apps\.apple\.com\/([a-z]{2})\//.exec(url || "");
+    return m ? m[1] : "us";
+  }
+
+  function idOf(url) {
+    var m = /id(\d+)/.exec(url || "");
+    return m ? m[1] : "";
+  }
+
+  function badgeFor(status) {
+    if (status === "online") return '<span class="badge online">' + ONLINE_ICON + '在线</span>';
+    if (status === "offline") return '<span class="badge offline">' + OFFLINE_ICON + '离线</span>';
+    return '<span class="badge unknown">' + UNKNOWN_ICON + '未确认</span>';
+  }
+
+  function stCell(status) {
+    if (status === "online") return '<span class="st-cell online">' + ONLINE_ICON + '在线</span>';
+    if (status === "offline") return '<span class="st-cell offline">' + OFFLINE_ICON + '离线</span>';
+    return '<span class="st-cell unknown">' + UNKNOWN_ICON + '未确认</span>';
+  }
+
+  function cardHTML(a) {
+    return (
+      '<article class="card" data-status="' + a.status + '">' +
+        '<div class="card-top">' +
+          '<div class="icon">' + (a.icon ? '<img src="' + a.icon + '" alt="' + a.name + ' 图标" loading="lazy">' : '') + '</div>' +
+          '<div class="title-block">' +
+            '<div class="app-name">' + a.name + '</div>' +
+            '<div class="dev">' + (a.developer || "–") + '</div>' +
+          '</div>' +
+          badgeFor(a.status) +
+        '</div>' +
+        '<div class="bundle-line">' +
+          '<span class="bundle">' + (a.bundleId || "–") + '</span>' +
+          '<button class="copy-btn" data-bundle="' + (a.bundleId || "") + '" aria-label="复制 Bundle ID">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>' +
+            '<span>复制</span>' +
+          '</button>' +
+        '</div>' +
+        '<div class="kv">' +
+          '<div class="row"><span class="k">开发者</span><span class="v">' + (a.developer || "–") + '</span></div>' +
+          '<div class="row"><span class="k">上架日期</span><span class="v">' + (a.releaseDate || "–") + '</span></div>' +
+          '<div class="row"><span class="k">当前版本</span><span class="v">' + (a.version ? "v" + a.version : "–") + '</span></div>' +
+        '</div>' +
+        '<div class="actions">' +
+          '<a class="btn-store" href="' + a.url + '" target="_blank" rel="noopener">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M13 5l7 7-7 7"/></svg>' +
+            '打开 App Store' +
+          '</a>' +
+        '</div>' +
+      '</article>'
+    );
+  }
+
+  function rowHTML(a) {
+    return (
+      '<tr data-status="' + a.status + '">' +
+        '<td class="tname">' + a.name + '</td>' +
+        '<td class="mono">' + (a.bundleId || "–") + '</td>' +
+        '<td>' + (a.developer || "–") + '</td>' +
+        '<td>' + (a.releaseDate || "–") + '</td>' +
+        '<td>' + (a.version ? "v" + a.version : "–") + '</td>' +
+        '<td>' + stCell(a.status) + '</td>' +
+        '<td><a class="link" href="' + a.url + '" target="_blank" rel="noopener">查看</a></td>' +
+      '</tr>'
+    );
+  }
+
+  function applyFilter() {
+    var cards = document.querySelectorAll("#cards .card");
+    var rows = document.querySelectorAll("#rows tr");
+    var shown = 0;
+    cards.forEach(function (c) {
+      var hit = filter === "all" || c.dataset.status === filter;
+      c.style.display = hit ? "" : "none";
+      if (hit) shown++;
+    });
+    rows.forEach(function (r) {
+      r.style.display = (filter === "all" || r.dataset.status === filter) ? "" : "none";
+    });
+    document.getElementById("empty").classList.toggle("show", shown === 0);
+    document.getElementById("count-line").textContent = "当前显示 " + shown + " 款 App";
+  }
+
+  function render() {
+    var apps = CURRENT.apps || [];
+    var online = apps.filter(function (a) { return a.status === "online"; }).length;
+    var offline = apps.filter(function (a) { return a.status === "offline"; }).length;
+    var unknown = apps.length - online - offline;
+    document.getElementById("kpi-total").textContent = apps.length;
+    document.getElementById("kpi-online").textContent = online;
+    document.getElementById("kpi-offline").textContent = offline;
+    document.getElementById("kpi-rate").textContent = apps.length ? Math.round(online / apps.length * 100) + "%" : "–";
+    document.getElementById("kpi-rate-note").textContent =
+      unknown ? (unknown + " 款待确认") : (apps.length ? "当前全部健康" : "等待数据");
+    document.getElementById("cnt-all").textContent = apps.length;
+    document.getElementById("cnt-online").textContent = online;
+    document.getElementById("cnt-offline").textContent = offline;
+
+    document.getElementById("cards").innerHTML = apps.map(cardHTML).join("");
+    document.getElementById("rows").innerHTML = apps.map(rowHTML).join("");
+
+    document.querySelectorAll(".copy-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var val = btn.dataset.bundle;
+        var span = btn.querySelector("span");
+        function done() {
+          span.textContent = "已复制";
+          setTimeout(function () { span.textContent = "复制"; }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(val).then(done).catch(function () { fallbackCopy(val); done(); });
+        } else {
+          fallbackCopy(val);
+          done();
+        }
+      });
+    });
+
+    applyFilter();
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  function setStamp(label, isManual) {
+    var dot = document.getElementById("stamp-dot");
+    dot.className = "dot" + (isManual ? " paused" : "");
+    document.getElementById("stamp-label").textContent = label;
+  }
+
+  function setModebar(html) {
+    var bar = document.getElementById("modebar");
+    if (html) {
+      bar.style.display = "flex";
+      document.getElementById("modebar-text").innerHTML = html;
+    } else {
+      bar.style.display = "none";
+    }
+  }
+
+  function loadData() {
+    fetch("data.json", { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("no data.json");
+        return res.json();
+      })
+      .then(function (data) {
+        var apps = (data && data.apps) ? data.apps : [];
+        CURRENT = { apps: apps, checked_at: data.checked_at || null, source: "cloud" };
+        setStamp("自动核验 · " + fmtTime(data.checked_at) + " · 每日更新", false);
+        setModebar("");
+        document.getElementById("footer-note").textContent =
+          "包体信息与在线状态由云端每日定时核验（GitHub Actions · " + fmtTime(data.checked_at) + "），可点击右上角「立即检测」实时刷新";
+        render();
+      })
+      .catch(function () {
+        // 本地打开（file://）无 data.json 时，用兜底数据展示
+        CURRENT = { apps: FALLBACK_APPS.slice(), checked_at: null, source: "fallback" };
+        setStamp("本地预览模式 · 内置快照", false);
+        setModebar("<b>本地预览：</b>当前展示内置数据快照。部署到云端后，将每天自动核验并更新数据。");
+        document.getElementById("footer-note").textContent =
+          "本地预览模式：展示内置数据快照；部署到云端后将每天自动更新";
+        render();
+      });
+  }
+
+  // ===== 立即检测（JSONP 调 App Store 官方接口，不依赖后端） =====
+  function jsonp(url, cb) {
+    var cbName = "itunesCb" + Date.now() + Math.floor(Math.random() * 1000);
+    var script = document.createElement("script");
+    function cleanup() {
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = function (data) { cleanup(); cb(data); };
+    script.onerror = function () { cleanup(); cb(null); };
+    script.src = url + "&callback=" + cbName;
+    document.body.appendChild(script);
+  }
+
+  function checkNow() {
+    var btn = document.getElementById("check-now");
+    var apps = (CURRENT.apps && CURRENT.apps.length) ? CURRENT.apps : FALLBACK_APPS;
+    btn.classList.add("loading");
+    btn.querySelector("span").textContent = "检测中…";
+    var updated = apps.map(function (a) {
+      var copy = {};
+      for (var k in a) copy[k] = a[k];
+      copy.status = "unknown";
+      return copy;
+    });
+    var done = 0;
+    var total = apps.length;
+    function finish() {
+      CURRENT = { apps: updated, checked_at: new Date().toISOString(), source: "manual" };
+      setStamp("手动检测 · " + fmtTime(CURRENT.checked_at), true);
+      btn.classList.remove("loading");
+      btn.querySelector("span").textContent = "立即检测";
+      render();
+    }
+    if (total === 0) { finish(); return; }
+    apps.forEach(function (a, i) {
+      var id = idOf(a.url);
+      jsonp("https://itunes.apple.com/lookup?id=" + id + "&country=" + regionOf(a.url), function (r) {
+        if (r && r.results && r.results.length) {
+          var x = r.results[0];
+          updated[i].name = x.trackName || updated[i].name;
+          updated[i].developer = x.artistName || updated[i].developer;
+          updated[i].bundleId = x.bundleId || updated[i].bundleId;
+          updated[i].version = x.version || updated[i].version;
+          updated[i].releaseDate = (x.releaseDate || "").slice(0, 10) || updated[i].releaseDate;
+          updated[i].url = (x.trackViewUrl || updated[i].url).replace("?uo=4", "");
+          if (x.artworkUrl100) updated[i].icon = x.artworkUrl100.replace("100x100bb", "256x256bb");
+          updated[i].status = "online";
+        } else {
+          updated[i].status = "offline";
+        }
+        done++;
+        if (done === total) finish();
+      });
+    });
+  }
+
+  // ===== 初始化 =====
+  document.querySelectorAll(".tabs button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      filter = btn.dataset.filter;
+      document.querySelectorAll(".tabs button").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      applyFilter();
+    });
+  });
+  document.getElementById("check-now").addEventListener("click", checkNow);
+  loadData();
+</script>
+</body>
+</html>
