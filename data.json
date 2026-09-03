@@ -1,0 +1,82 @@
+{
+  "checked_at": "2026-09-03T14:23:20+08:00",
+  "apps": [
+    {
+      "name": "Coiffures",
+      "url": "https://apps.apple.com/us/app/coiffures/id6793454542",
+      "status": "online",
+      "checkedAt": "2026-09-03T14:23:18+08:00",
+      "developer": "DERICK PALMES",
+      "bundleId": "com.coiffures",
+      "releaseDate": "2026-08-04",
+      "version": "1.0.1",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/3f/88/b8/3f88b851-9338-3ff4-5bcd-80b3ac354847/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg"
+    },
+    {
+      "name": "RoamCamp",
+      "url": "https://apps.apple.com/hk/app/roamcamp/id6802578049",
+      "status": "online",
+      "checkedAt": "2026-09-03T14:23:19+08:00",
+      "developer": "Emine Ak",
+      "bundleId": "com.roamcamp",
+      "releaseDate": "2026-08-24",
+      "version": "1.1.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/03/27/8f/03278fc7-0b3e-96eb-82e2-bba74ac52298/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg"
+    },
+    {
+      "name": "Anniversary Tracker Memories",
+      "url": "https://apps.apple.com/us/app/anniversary-tracker-memories/id6796228189",
+      "status": "online",
+      "checkedAt": "2026-09-03T14:23:19+08:00",
+      "developer": "LEVAZ HOLLINGWORTH",
+      "bundleId": "com.appAnniversaryTracker",
+      "releaseDate": "2026-08-24",
+      "version": "1.0.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/bd/a3/3d/bda33dfb-2c86-fbdf-bdde-67462cc6aa3d/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg"
+    },
+    {
+      "name": "DropIt. Quit Bad Habits",
+      "url": "https://apps.apple.com/us/app/dropit-quit-bad-habits/id6795485506",
+      "status": "online",
+      "checkedAt": "2026-09-03T14:23:19+08:00",
+      "developer": "KUNNAR KALLASTE",
+      "bundleId": "com.dropitapp",
+      "releaseDate": "2026-08-27",
+      "version": "1.0.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8e/aa/68/8eaa689d-cb91-6158-6df1-626b70987c7e/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg"
+    },
+    {
+      "name": "Flavor Alchemy",
+      "url": "https://apps.apple.com/us/app/flavor-alchemy/id6804640838",
+      "status": "online",
+      "checkedAt": "2026-09-03T14:23:20+08:00",
+      "developer": "TAMBET MALK",
+      "bundleId": "com.littleMain.justListC",
+      "releaseDate": "2026-08-28",
+      "version": "1.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/bd/54/43/bd5443de-ffd0-6ad2-544e-64cc8361c2f0/AppIcon-1x_U007emarketing-0-8-0-85-220-0.png/256x256bb.jpg"
+    },
+    {
+      "name": "FutureMe: Time Capsule",
+      "url": "https://apps.apple.com/us/app/futureme-time-capsule/id6776085961",
+      "status": "online",
+      "checkedAt": "2026-09-03T14:23:20+08:00",
+      "developer": "Ruchika Daswal",
+      "bundleId": "com.futureme2026",
+      "releaseDate": "2026-06-10",
+      "version": "1.2.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/4d/6a/cf/4d6acf1f-cd81-b38e-5031-8ed6bf5826cc/AppIcon-1x_U007ephone-0-11-0-85-220-0.png/256x256bb.jpg"
+    },
+    {
+      "name": "Nailory",
+      "url": "https://apps.apple.com/us/app/nailory/id6772021868",
+      "status": "online",
+      "checkedAt": "2026-09-03T14:23:20+08:00",
+      "developer": "Alok Mundy",
+      "bundleId": "com.manicures2026",
+      "releaseDate": "2026-07-06",
+      "version": "1.1.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5e/a5/34/5ea534fe-197f-d9a7-c4ba-e79b2d8d6b95/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg"
+    }
+  ]
+}
