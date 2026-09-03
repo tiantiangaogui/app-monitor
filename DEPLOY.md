@@ -79,42 +79,33 @@ app-monitor/
 
 ### 第 4 步（可选，推荐）：配置下架邮件通知
 
-默认**不配置也照常运行**，只是不发邮件。想让"有 App 下架"时自动发邮件到 `tanemouse@163.com`，需在仓库配置 5 个密钥（Secrets）：
+默认**不配置也照常运行**，只是不发邮件。想让"有 App 下架"时自动发邮件到 `tanemouse@163.com`，需在仓库配置 5 个密钥（Secrets）。
+
+本监控台默认推荐用 **Gmail（`tanemouse@gmail.com`）作为发件邮箱**，告警邮件发到 `tanemouse@163.com`。
 
 1. 进入仓库 → **Settings** → 左侧 **Secrets and variables** → **Actions**
 2. 点击 **New repository secret**，逐个添加以下 5 项：
 
 | Secret 名称 | 填写内容 | 示例 |
 |---|---|---|
-| `SMTP_HOST` | 发件邮箱的 SMTP 服务器地址 | `smtp.163.com` |
+| `SMTP_HOST` | 发件邮箱的 SMTP 服务器地址 | `smtp.gmail.com` |
 | `SMTP_PORT` | SMTP 端口 | `465` |
-| `SMTP_USERNAME` | 发件邮箱完整地址 | `yourmail@163.com` |
-| `SMTP_PASSWORD` | 发件邮箱的 **SMTP 授权码**（不是登录密码） | `xxxxxxxxxxxx` |
+| `SMTP_USERNAME` | 发件邮箱完整地址 | `tanemouse@gmail.com` |
+| `SMTP_PASSWORD` | 发件邮箱的 **应用专用密码**（Gmail 不是登录密码） | `xxxxxxxxxxxxxxxx` |
 | `MAIL_TO` | 收件邮箱（不填默认发给 `tanemouse@163.com`） | `tanemouse@163.com` |
 
-> **用 163 邮箱发件的授权码获取方法**：登录网页版 163 邮箱 → 设置 → POP3/SMTP/IMAP → 开启「SMTP 服务」→ 按提示用手机扫码发送短信验证 → 获得一串授权码，把它填进 `SMTP_PASSWORD`（发件邮箱可以是 `tanemouse@163.com` 自己，也可以另用其他邮箱）。
+> **用 Gmail 发件的准备（关键：Gmail 不允许用登录密码做 SMTP）**：
 >
-> 163 SMTP 固定参数：服务器 `smtp.163.com`，端口 `465`（SSL，脚本已内置支持）。
+> 1. 先开启两步验证：打开 `myaccount.google.com/security` → 两步验证 → 按提示绑定手机开启（未开启两步验证无法生成应用专用密码）。
+> 2. 再打开应用密码直达页：`myaccount.google.com/apppasswords` → 应用选「邮件」→ 设备选「其他（自定义名称）」→ 点「生成」。
+> 3. 得到一串 **16 位字母**（形如 `abcd efgh ijkl mnop`），**只显示一次，当场复制**；填进 `SMTP_PASSWORD` 时**去掉空格**。
+> 4. 应用专用密码可随时在 `myaccount.google.com/apppasswords` 撤销重建；若曾在非安全渠道泄露，建议配好后撤销并重新生成一个。
+> 5. 若该 Gmail 是公司/学校托管（Google Workspace），管理员可能禁用应用密码，需管理员放行或改用其他邮箱发件。
 
-> **改用 Gmail 作为发件邮箱的配置**：
+> **改用 163 邮箱发件（备选，把 `tanemouse@gmail.com` 换成 163）**：
 >
-> 1. **获取应用专用密码**（Gmail 不允许用登录密码做 SMTP）：
->    - 先开启两步验证：打开 `myaccount.google.com/security` → 两步验证 → 按提示绑定手机开启
->    - 再打开应用密码直达页：`myaccount.google.com/apppasswords` → 应用选「邮件」→ 设备选「其他（自定义名称）」→ 点「生成」
->    - 得到一串 **16 位字母**（形如 `abcd efgh ijkl mnop`），**只显示一次，当场复制；填进 Secrets 时去掉空格**
-> 2. **更新 GitHub Secrets**：
->
->    | Secret | 值 |
->    |---|---|
->    | `SMTP_HOST` | `smtp.gmail.com` |
->    | `SMTP_PORT` | `465` |
->    | `SMTP_USERNAME` | 完整 Gmail 地址，如 `tanemouse@gmail.com` |
->    | `SMTP_PASSWORD` | 第 1 步生成的 16 位应用专用密码（去掉空格） |
->    | `MAIL_TO` | 收件邮箱（可保持 `tanemouse@163.com`，也可设为 Gmail） |
->
-> 3. 若账号是公司/学校托管（Google Workspace），管理员可能禁用应用密码，需管理员放行或改用其他邮箱。
->
-> 4. 补充：应用专用密码可随时在 `myaccount.google.com/apppasswords` 撤销重建；若密码曾在非安全渠道泄露，建议配置完成后撤销并重新生成一个。
+> - 授权码获取：登录网页版 163 邮箱 → 设置 → POP3/SMTP/IMAP → 开启「SMTP 服务」→ 手机扫码短信验证 → 获得授权码，填进 `SMTP_PASSWORD`（非登录密码）。
+> - 对应 Secrets 参数：`SMTP_HOST`=`smtp.163.com`、`SMTP_PORT`=`465`、`SMTP_USERNAME`=`你的163邮箱`、`SMTP_PASSWORD`=163 授权码、`MAIL_TO`=`tanemouse@163.com`。
 
 3. 配置完成后，在 Actions 里手动 Run 一次即可生效。
 4. 邮件触发逻辑：**只有当某个包"从在线变为下架"时**才会发通知（每小时检测，历史已下架的包不会重复骚扰）；通知里包含包名、Bundle ID、开发者、商店链接和检测时间。
@@ -175,8 +166,8 @@ schedule:
 | 定时任务没到点执行 | GitHub Actions 的 cron 最小粒度是 5 分钟，且实际执行时间可能有几分钟延迟，属正常现象 |
 | 手动 Run 报错 | 点进 workflow 展开失败步骤看日志；最常见是 `check_status.py` 所在路径不对（应位于仓库根目录） |
 | data.json 一直不更新 | 确认所有 App 的状态没变化（没变化时不会产生提交，属正常）；或进 Actions 看最近一次运行日志 |
-| 没收到下架邮件 | ① 检查是否配置了第 4 步的 5 个 Secrets；② 确认 `SMTP_PASSWORD` 填的是**授权码**而非登录密码；③ 在 Actions 日志里搜 `[邮件]` 看发送结果；④ 163 邮箱需先在网页端开启 SMTP 服务 |
-| 邮件发送失败提示 | 核对 SMTP 服务器/端口：163 用 `smtp.163.com` + `465`；QQ 邮箱用 `smtp.qq.com` + `465`（授权码获取方式不同但原理相同） |
+| 没收到下架邮件 | ① 检查是否配置了第 4 步的 5 个 Secrets；② 确认 `SMTP_USERNAME` 用的 Gmail 且 `SMTP_PASSWORD` 填的是**应用专用密码**（非登录密码）——没开两步验证或没生成应用专用密码会导致认证失败；③ 在 Actions 日志里搜 `[邮件]` 看发送结果；④ 用 Gmail 需先开启两步验证 + 生成应用专用密码（见第 4 步） |
+| 邮件发送失败提示 | 核对 SMTP 服务器/端口：Gmail 用 `smtp.gmail.com` + `465`；163 用 `smtp.163.com` + `465`；QQ 用 `smtp.qq.com` + `465`（Gmail/163/QQ 的密码字段分别填应用专用密码/授权码） |
 | Private 仓库无法开启 Pages | GitHub Pages 免费版仅支持 Public 仓库；把仓库设为 Public，或用其他托管方案（见 README） |
 
 ---
