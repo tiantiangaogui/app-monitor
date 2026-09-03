@@ -41,7 +41,7 @@
    - 之后 workflow 会按计划**每小时自动运行**：核验各 App 状态 → 若 `data.json` 有变化则自动提交推送 → GitHub Pages 自动重新发布。全程无需人工干预。
 
 4. **（推荐）配置下架邮件告警**
-   - 想让"有 App 下架"时自动收到邮件（默认收件人 `tanemouse@163.com`），在仓库 `Settings → Secrets and variables → Actions` 添加 5 个密钥：`SMTP_HOST`（默认推荐 `smtp.gmail.com`）、`SMTP_PORT`（`465`）、`SMTP_USERNAME`（发件邮箱，默认推荐 `tanemouse@gmail.com`）、`SMTP_PASSWORD`（发件邮箱的 **应用专用密码 / SMTP 授权码**，Gmail 需先生成应用专用密码）、`MAIL_TO`（收件邮箱）。
+   - 想让"有 App 下架"时自动收到邮件，在仓库 `Settings → Secrets and variables → Actions` 添加 5 个密钥：`SMTP_HOST`（默认推荐 `smtp.gmail.com`）、`SMTP_PORT`（`465`）、`SMTP_USERNAME`（发件邮箱，默认推荐 `收件箱`）、`SMTP_PASSWORD`（发件邮箱的 **应用专用密码 / SMTP 授权码**，Gmail 需先生成应用专用密码）、`MAIL_TO`（收件邮箱）。
    - 未配置时监控照常运行，只是不发邮件。详细步骤见 `DEPLOY.md` 第 4 步。
 
 ## 三、日常维护
@@ -76,5 +76,5 @@
 - **网站显示"本地预览模式"**：说明当前是用浏览器直接打开本地文件，`data.json` 读取不到。部署到 GitHub Pages 后即为自动模式。
 - **多久更新一次**：默认每小时整点（北京时间）自动核验。想改频率，编辑 `.github/workflows/update.yml` 里的 `cron` 表达式（`0 * * * *` 为每小时整点，UTC 时间）。
 - **数据没变化时会不会白跑**：不会。脚本每小时都会核验，但只有结果真的变化才提交新数据，无变化则跳过提交。
-- **App 真下架了会怎样**：脚本会把该 App 标记为「离线」，网站卡片和表格会显示红色「离线」徽章，KPI 离线数随之变化；同时（若已配置 SMTP 密钥）自动发邮件到 `tanemouse@163.com` 通知包名与链接。只有"从在线变为下架"才发一次，已下架的包不会重复通知。
+- **App 真下架了会怎样**：脚本会把该 App 标记为「离线」，网站卡片和表格会显示红色「离线」徽章，KPI 离线数随之变化；同时（若已配置 SMTP 密钥）自动发邮件到 `设置的邮箱` 通知包名与链接。只有"从在线变为下架"才发一次，已下架的包不会重复通知。
 - **没收到下架邮件**：检查是否已配置第 4 步的 5 个 Secrets，且 `SMTP_PASSWORD` 填的是发件邮箱的 **SMTP 专用密码/授权码**（用 Gmail 发件须填 Gmail 应用专用密码，非登录密码）；也可在 Actions 日志中搜索 `[邮件]` 查看发送结果。
