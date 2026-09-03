@@ -79,9 +79,9 @@ app-monitor/
 
 ### 第 4 步（可选，推荐）：配置下架邮件通知
 
-默认**不配置也照常运行**，只是不发邮件。想让"有 App 下架"时自动发邮件到 `tanemouse@163.com`，需在仓库配置 5 个密钥（Secrets）。
+默认**不配置也照常运行**，只是不发邮件。想让"有 App 下架"时自动发邮件到 `收件箱`，需在仓库配置 5 个密钥（Secrets）。
 
-本监控台默认推荐用 **Gmail（`tanemouse@gmail.com`）作为发件邮箱**，告警邮件发到 `tanemouse@163.com`。
+本监控台默认推荐用 **Gmail（`收件箱`）作为发件邮箱**，告警邮件发到 `收件箱`。
 
 1. 进入仓库 → **Settings** → 左侧 **Secrets and variables** → **Actions**
 2. 点击 **New repository secret**，逐个添加以下 5 项：
@@ -90,9 +90,9 @@ app-monitor/
 |---|---|---|
 | `SMTP_HOST` | 发件邮箱的 SMTP 服务器地址 | `smtp.gmail.com` |
 | `SMTP_PORT` | SMTP 端口 | `465` |
-| `SMTP_USERNAME` | 发件邮箱完整地址 | `tanemouse@gmail.com` |
+| `SMTP_USERNAME` | 发件邮箱完整地址 | `收件箱` |
 | `SMTP_PASSWORD` | 发件邮箱的 **应用专用密码**（Gmail 不是登录密码） | `xxxxxxxxxxxxxxxx` |
-| `MAIL_TO` | 收件邮箱（不填默认发给 `tanemouse@163.com`） | `tanemouse@163.com` |
+| `MAIL_TO` | 收件邮箱（不填默认发给 `收件箱`） | `收件箱` |
 
 > **用 Gmail 发件的准备（关键：Gmail 不允许用登录密码做 SMTP）**：
 >
@@ -102,10 +102,10 @@ app-monitor/
 > 4. 应用专用密码可随时在 `myaccount.google.com/apppasswords` 撤销重建；若曾在非安全渠道泄露，建议配好后撤销并重新生成一个。
 > 5. 若该 Gmail 是公司/学校托管（Google Workspace），管理员可能禁用应用密码，需管理员放行或改用其他邮箱发件。
 
-> **改用 163 邮箱发件（备选，把 `tanemouse@gmail.com` 换成 163）**：
+> **改用 163 邮箱发件（备选，把 `收件箱` 换成 163）**：
 >
 > - 授权码获取：登录网页版 163 邮箱 → 设置 → POP3/SMTP/IMAP → 开启「SMTP 服务」→ 手机扫码短信验证 → 获得授权码，填进 `SMTP_PASSWORD`（非登录密码）。
-> - 对应 Secrets 参数：`SMTP_HOST`=`smtp.163.com`、`SMTP_PORT`=`465`、`SMTP_USERNAME`=`你的163邮箱`、`SMTP_PASSWORD`=163 授权码、`MAIL_TO`=`tanemouse@163.com`。
+> - 对应 Secrets 参数：`SMTP_HOST`=`smtp.163.com`、`SMTP_PORT`=`465`、`SMTP_USERNAME`=`你的163邮箱`、`SMTP_PASSWORD`=163 授权码、`MAIL_TO`=`收件箱`。
 
 3. 配置完成后，在 Actions 里手动 Run 一次即可生效。
 4. 邮件触发逻辑：**只有当某个包"从在线变为下架"时**才会发通知（每小时检测，历史已下架的包不会重复骚扰）；通知里包含包名、Bundle ID、开发者、商店链接和检测时间。
@@ -181,7 +181,7 @@ schedule:
              ├─ 逐个调用 App Store 官方接口 itunes.apple.com/lookup
              ├─ 判断每个 App 在线 / 离线，抓取最新包体信息
              ├─ 与上一轮 data.json 对比，找出"新下架"的包
-             ├─ 有新下架 → 用 SMTP 发邮件到 tanemouse@163.com（含包名/Bundle ID/链接）
+             ├─ 有新下架 → 用 SMTP 发邮件到 收件箱（含包名/Bundle ID/链接）
              └─ 生成 data.json（含核验时间）
         ├─ 若数据有变化 → 自动 git commit + push
         │     └─ 触发 GitHub Pages 重新构建发布 → 网站更新
