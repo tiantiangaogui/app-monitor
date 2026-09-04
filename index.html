@@ -329,7 +329,7 @@
         APP STORE 运营监控
       </div>
       <h1>App 包体信息监控台</h1>
-      <p class="sub">iOS 在管应用的包体信息与在线状态 · 云端每日自动核验 + 可手动即时刷新</p>
+      <p class="sub">iOS 在管应用的包体信息与在线状态 · 云端每小时自动核验 + 可手动即时刷新</p>
     </div>
     <div class="stamp" id="stamp">
       <span class="dot" id="stamp-dot"></span>
@@ -594,19 +594,19 @@
       .then(function (data) {
         var apps = (data && data.apps) ? data.apps : [];
         CURRENT = { apps: apps, checked_at: data.checked_at || null, source: "cloud" };
-        setStamp("自动核验 · " + fmtTime(data.checked_at) + " · 每日更新", false);
+        setStamp("自动核验 · " + fmtTime(data.checked_at) + " · 每小时更新", false);
         setModebar("");
         document.getElementById("footer-note").textContent =
-          "包体信息与在线状态由云端每日定时核验（GitHub Actions · " + fmtTime(data.checked_at) + "），可点击右上角「立即检测」实时刷新";
+          "包体信息与在线状态由云端每小时定时核验（GitHub Actions · " + fmtTime(data.checked_at) + "），可点击右上角「立即检测」实时刷新";
         render();
       })
       .catch(function () {
         // 本地打开（file://）无 data.json 时，用兜底数据展示
         CURRENT = { apps: FALLBACK_APPS.slice(), checked_at: null, source: "fallback" };
         setStamp("本地预览模式 · 内置快照", false);
-        setModebar("<b>本地预览：</b>当前展示内置数据快照。部署到云端后，将每天自动核验并更新数据。");
+        setModebar("<b>本地预览：</b>当前展示内置数据快照。部署到云端后，将每小时自动核验并更新数据。");
         document.getElementById("footer-note").textContent =
-          "本地预览模式：展示内置数据快照；部署到云端后将每天自动更新";
+          "本地预览模式：展示内置数据快照；部署到云端后将每小时自动更新";
         render();
       });
   }
