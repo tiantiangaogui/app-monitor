@@ -1,9 +1,9 @@
-name: 包体状态核验（每小时）
+name: 包体状态核验（每4小时）
 
 on:
   schedule:
-    # 每小时整点运行（GitHub cron 为 UTC 时间，即北京时间每小时整点），全天 24 次
-    - cron: '0 * * * *'
+    # 每 4 小时整点运行（GitHub cron 为 UTC 时间，即北京时间每 4 小时整点）：00/04/08/12/16/20 时（UTC），全天 6 次
+    - cron: '0 */4 * * *'
   workflow_dispatch: {}   # 支持在 Actions 页面手动触发一次
 
 permissions:
