@@ -198,6 +198,17 @@
   .kv .k { color: var(--ink-2); flex-shrink: 0; }
   .kv .v { text-align: right; color: var(--ink); word-break: break-all; }
 
+  .snapshot-note {
+    margin-top: 2px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    background: var(--code-bg);
+    color: var(--ink-2);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .snapshot-note b { color: var(--ink); font-weight: 600; }
+
   .bundle-line {
     display: flex;
     align-items: center;
@@ -480,6 +491,11 @@
           '<div class="row"><span class="k">上架日期</span><span class="v">' + (a.releaseDate || "–") + '</span></div>' +
           '<div class="row"><span class="k">当前版本</span><span class="v">' + (a.version ? "v" + a.version : "–") + '</span></div>' +
         '</div>' +
+        (a.infoSnapshot
+          ? '<div class="snapshot-note">已下架，以下信息为<b>最后一次在线' +
+            (a.snapshotAt ? "（" + fmtTime(a.snapshotAt) + "）" : "") +
+            '</b>的存档快照，App Store 已无法再获取实时数据</div>'
+          : "") +
         '<div class="actions">' +
           '<a class="btn-store" href="' + a.url + '" target="_blank" rel="noopener">' +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M13 5l7 7-7 7"/></svg>' +

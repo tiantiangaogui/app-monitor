@@ -1,0 +1,77 @@
+{
+  "_note": "App 元数据快照库：记录每个 App 最后一次在线时的图标/开发者/Bundle ID/上架日期/版本。App 下架后 iTunes API 无法再查到这些信息，检测脚本会用此文件兜底展示，避免下架卡片信息空白。在线时由 check_status.py 自动更新。",
+  "apps": {
+    "6793454542": {
+      "name": "Coiffures",
+      "developer": "DERICK PALMES",
+      "bundleId": "com.coiffures",
+      "releaseDate": "2026-08-04",
+      "version": "1.0.1",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/3f/88/b8/3f88b851-9338-3ff4-5bcd-80b3ac354847/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg",
+      "updatedAt": "2026-09-06T10:26:16+08:00"
+    },
+    "6796228189": {
+      "name": "Anniversary Tracker Memories",
+      "developer": "LEVAZ HOLLINGWORTH",
+      "bundleId": "com.appAnniversaryTracker",
+      "releaseDate": "2026-08-24",
+      "version": "1.0.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/bd/a3/3d/bda33dfb-2c86-fbdf-bdde-67462cc6aa3d/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg",
+      "updatedAt": "2026-09-06T10:26:17+08:00"
+    },
+    "6795485506": {
+      "name": "DropIt. Quit Bad Habits",
+      "developer": "KUNNAR KALLASTE",
+      "bundleId": "com.dropitapp",
+      "releaseDate": "2026-08-27",
+      "version": "1.0.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8e/aa/68/8eaa689d-cb91-6158-6df1-626b70987c7e/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg",
+      "updatedAt": "2026-09-06T10:26:17+08:00"
+    },
+    "6804640838": {
+      "name": "Flavor Alchemy",
+      "developer": "TAMBET MALK",
+      "bundleId": "com.littleMain.justListC",
+      "releaseDate": "2026-08-28",
+      "version": "1.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/bd/54/43/bd5443de-ffd0-6ad2-544e-64cc8361c2f0/AppIcon-1x_U007emarketing-0-8-0-85-220-0.png/256x256bb.jpg",
+      "updatedAt": "2026-09-06T10:26:17+08:00"
+    },
+    "6776085961": {
+      "name": "FutureMe: Time Capsule",
+      "developer": "Ruchika Daswal",
+      "bundleId": "com.futureme2026",
+      "releaseDate": "2026-06-10",
+      "version": "1.2.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/4d/6a/cf/4d6acf1f-cd81-b38e-5031-8ed6bf5826cc/AppIcon-1x_U007ephone-0-11-0-85-220-0.png/256x256bb.jpg",
+      "updatedAt": "2026-09-06T10:26:18+08:00"
+    },
+    "6772021868": {
+      "name": "Nailory",
+      "developer": "Alok Mundy",
+      "bundleId": "com.manicures2026",
+      "releaseDate": "2026-07-06",
+      "version": "1.1.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5e/a5/34/5ea534fe-197f-d9a7-c4ba-e79b2d8d6b95/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg",
+      "updatedAt": "2026-09-06T10:26:18+08:00"
+    },
+    "6775783744": {
+      "name": "Pass It On - Story Sentence",
+      "developer": "Pragati Pundir",
+      "bundleId": "com.passiton.vd",
+      "releaseDate": "2026-06-13",
+      "version": "1.0.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/41/db/82/41db822f-2b0a-33ef-0be0-05e2ea441e13/AppIcon-0-0-1x_U007ephone-0-11-0-0-85-220.png/256x256bb.jpg",
+      "updatedAt": "2026-09-06T10:26:18+08:00"
+    },
+    "6802578049": {
+      "name": "RoamCamp",
+      "developer": "Emine Ak",
+      "bundleId": "com.roamcamp",
+      "releaseDate": "2026-08-24",
+      "version": "1.1.0",
+      "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/03/27/8f/03278fc7-0b3e-96eb-82e2-bba74ac52298/AppIcon-1x_U007ephone-0-1-85-220-0.png/256x256bb.jpg",
+      "updatedAt": "2026-09-06T01:56:01+08:00"
+    }
+  }
+}
