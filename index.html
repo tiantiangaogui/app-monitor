@@ -367,8 +367,8 @@
 
   <div class="toolbar">
     <div class="tabs" role="tablist" aria-label="在线状态筛选">
-      <button data-filter="all" class="active" role="tab">全部<span class="cnt" id="cnt-all"></span></button>
-      <button data-filter="online" role="tab">在线<span class="cnt" id="cnt-online"></span></button>
+      <button data-filter="all" role="tab">全部<span class="cnt" id="cnt-all"></span></button>
+      <button data-filter="online" class="active" role="tab">在线<span class="cnt" id="cnt-online"></span></button>
       <button data-filter="offline" role="tab">离线<span class="cnt" id="cnt-offline"></span></button>
     </div>
     <div class="toolbar-right">
@@ -421,7 +421,7 @@
 ];
 
   var CURRENT = { apps: [], checked_at: null, source: "fallback" };
-  var filter = "all";
+  var filter = "online";
 
   var ONLINE_ICON = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#34c759" class="live"/></svg>';
   var OFFLINE_ICON = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#ff3b30"/></svg>';
