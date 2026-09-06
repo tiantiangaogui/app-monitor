@@ -21,6 +21,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT = os.path.join(BASE_DIR, "data.json")
 CONFIG = os.path.join(BASE_DIR, "apps.json")
 DOWN_FILE = os.path.join(BASE_DIR, "down.json")
+META_FILE = os.path.join(BASE_DIR, "meta.json")
 
 # 收件人默认值（未配置 MAIL_TO 环境变量时使用）。
 # 注意：请勿在此填写任何真实邮箱——本仓库是 Public，人人可见。
@@ -34,6 +35,39 @@ def load_apps():
         return json.load(f)
 
 
+def load_meta():
+    """读取元数据快照库 meta.json（App 下架后 iTunes 查不到信息，用它兜底）"""
+    if os.path.exists(META_FILE):
+        try:
+            with open(META_FILE, encoding="utf-8") as f:
+                m = json.load(f)
+            if isinstance(m.get("apps"), dict):
+                return m
+        except Exception:
+            pass
+    return {"_note": "App 元数据快照库：记录每个 App 最后一次在线时的图标/开发者/Bundle ID/上架日期/版本，供下架后兜底展示。", "apps": {}}
+
+
+def save_meta(meta):
+    """写回元数据快照库"""
+    with open(META_FILE, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+
+
+def upsert_meta(meta, info):
+    """在线核验成功后，刷新该 App 的元数据快照（保持快照始终是最新一次在线的样子）"""
+    store = meta.setdefault("apps", {})
+    store[info["storeId"]] = {
+        "name": info["name"],
+        "developer": info["developer"],
+        "bundleId": info["bundleId"],
+        "releaseDate": info["releaseDate"],
+        "version": info["version"],
+        "icon": info["icon"],
+        "updatedAt": info["checkedAt"],
+    }
+
+
 def fetch_lookup(store_id, country):
     """查询 iTunes lookup 接口，返回结果 dict 或 None"""
     url = "https://itunes.apple.com/lookup?id=%s&country=%s" % (store_id, country)
@@ -45,7 +79,7 @@ def fetch_lookup(store_id, country):
     return None
 
 
-def check_app(app):
+def check_app(app, meta):
     """检查单个 App，返回标准化的包体信息 dict"""
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(timespec="seconds")
     base = {
@@ -59,11 +93,20 @@ def check_app(app):
         "releaseDate": "",
         "version": "",
         "icon": "",
+        "infoSnapshot": False,
+        "snapshotAt": "",
     }
     try:
         r = fetch_lookup(app["storeId"], app["country"])
         if r is None:
             base["status"] = "offline"
+            # 下架后 iTunes 接口已查不到任何元数据，用本地快照库补全，避免卡片信息空白
+            snap = (meta.get("apps") or {}).get(app["storeId"])
+            if snap:
+                for k in ("developer", "bundleId", "releaseDate", "version", "icon"):
+                    base[k] = snap.get(k, "")
+                base["infoSnapshot"] = True
+                base["snapshotAt"] = snap.get("updatedAt", "")
             return base
         base["status"] = "online"
         base["name"] = r.get("trackName", app["name"])
@@ -173,18 +216,24 @@ def send_mail(subject, body):
 def main():
     apps_cfg = load_apps()
     prev = load_prev()
+    meta = load_meta()
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(timespec="seconds")
 
     apps = []
     newly_down = []
     for a in apps_cfg:
-        info = check_app(a)
+        info = check_app(a, meta)
         apps.append(info)
+        if info["status"] == "online":
+            # 在线时刷新快照，保证快照始终是"最后一次在线"的样子
+            upsert_meta(meta, info)
         # 只对"新下架"的包告警：本次 offline 且上一轮不是 offline（含无历史记录）
         if info["status"] == "offline":
             ps = prev_status(prev, a["storeId"], a["url"])
             if ps != "offline":
                 newly_down.append(info)
+
+    save_meta(meta)
 
     payload = {"checked_at": now, "apps": apps}
     with open(OUTPUT, "w", encoding="utf-8") as f:
