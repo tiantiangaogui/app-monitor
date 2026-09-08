@@ -45,7 +45,7 @@ def load_meta():
                 return m
         except Exception:
             pass
-    return {"_note": "App 元数据快照库：记录每个 App 最后一次在线时的图标/开发者/Bundle ID/上架日期/版本，供下架后兜底展示。", "apps": {}}
+    return {"_note": "App 元数据快照库：记录每个 App 最后一次在线时的图标/开发者/Bundle ID/主类型/上架日期/版本，供下架后兜底展示。", "apps": {}}
 
 
 def save_meta(meta):
@@ -61,6 +61,7 @@ def upsert_meta(meta, info):
         "name": info["name"],
         "developer": info["developer"],
         "bundleId": info["bundleId"],
+        "genre": info["genre"],
         "releaseDate": info["releaseDate"],
         "version": info["version"],
         "icon": info["icon"],
@@ -90,6 +91,7 @@ def check_app(app, meta):
         "checkedAt": now,
         "developer": "",
         "bundleId": "",
+        "genre": "",
         "releaseDate": "",
         "version": "",
         "icon": "",
@@ -103,7 +105,7 @@ def check_app(app, meta):
             # 下架后 iTunes 接口已查不到任何元数据，用本地快照库补全，避免卡片信息空白
             snap = (meta.get("apps") or {}).get(app["storeId"])
             if snap:
-                for k in ("developer", "bundleId", "releaseDate", "version", "icon"):
+                for k in ("developer", "bundleId", "genre", "releaseDate", "version", "icon"):
                     base[k] = snap.get(k, "")
                 base["infoSnapshot"] = True
                 base["snapshotAt"] = snap.get("updatedAt", "")
@@ -112,6 +114,7 @@ def check_app(app, meta):
         base["name"] = r.get("trackName", app["name"])
         base["developer"] = r.get("artistName", "")
         base["bundleId"] = r.get("bundleId", "")
+        base["genre"] = r.get("primaryGenreName", "")
         base["releaseDate"] = (r.get("releaseDate") or "")[:10]
         base["version"] = r.get("version", "")
         base["url"] = (r.get("trackViewUrl", "") or app["url"]).replace("?uo=4", "")
