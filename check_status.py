@@ -11,6 +11,7 @@ import os
 import re
 import datetime
 import smtplib
+import time
 import urllib.request
 from email.header import Header
 from email.mime.text import MIMEText
@@ -33,6 +34,52 @@ def load_apps():
     """从 apps.json 读取在管 App 清单（单一数据源，新增/删除 App 只需改这个文件）"""
     with open(CONFIG, encoding="utf-8") as f:
         return json.load(f)
+
+
+def now_cst():
+    """当前北京时间（Asia/Shanghai，脚本所有时间字段统一用这个口径）"""
+    return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
+
+
+def last_checked_at():
+    """读取上一轮 data.json 的核验时间；读不到返回 None"""
+    if not os.path.exists(OUTPUT):
+        return None
+    try:
+        with open(OUTPUT, encoding="utf-8") as f:
+            return json.load(f).get("checked_at")
+    except Exception:
+        return None
+
+
+def throttled():
+    """
+    节流判断：距上次实际更新不足 MIN_INTERVAL_HOURS 小时则跳过本轮。
+    GitHub 的 schedule 不准点（会延迟甚至跳过），所以改成每小时尝试一次 +
+    这里做节流，对外表现仍是约 4 小时更新一次。
+    返回 None 表示不节流可以跑；返回字符串表示跳过的理由。
+    """
+    if os.environ.get("FORCE_CHECK", "").strip().lower() in ("1", "true", "yes"):
+        return None
+    try:
+        interval = float(os.environ.get("MIN_INTERVAL_HOURS", "4"))
+    except ValueError:
+        interval = 4.0
+    if interval <= 0:
+        return None
+    raw = last_checked_at()
+    if not raw:
+        return None
+    try:
+        last = datetime.datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+    if last.tzinfo is None:
+        last = last.replace(tzinfo=datetime.timezone(datetime.timedelta(hours=8)))
+    elapsed = (now_cst() - last).total_seconds() / 3600.0
+    if elapsed < interval:
+        return "距上次核验仅 %.2f 小时（阈值 %.2f 小时），本轮跳过" % (elapsed, interval)
+    return None
 
 
 def load_meta():
@@ -69,20 +116,30 @@ def upsert_meta(meta, info):
     }
 
 
-def fetch_lookup(store_id, country):
-    """查询 iTunes lookup 接口，返回结果 dict 或 None"""
+def fetch_lookup(store_id, country, attempts=3, delay=4):
+    """
+    查询 iTunes lookup 接口，返回结果 dict 或 None。
+    空结果会重试：实践发现接口偶发返回 resultCount=0（网络抖动/限流），
+    单次判定会把在线包误判成下架并误发告警邮件，所以必须多查几次再下结论。
+    """
     url = "https://itunes.apple.com/lookup?id=%s&country=%s" % (store_id, country)
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 status-check"})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-    if data.get("resultCount", 0) > 0:
-        return data["results"][0]
+    for i in range(attempts):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 status-check"})
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if data.get("resultCount", 0) > 0:
+                return data["results"][0]
+        except Exception:
+            pass
+        if i < attempts - 1:
+            time.sleep(delay)
     return None
 
 
 def check_app(app, meta):
     """检查单个 App，返回标准化的包体信息 dict"""
-    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(timespec="seconds")
+    now = now_cst().isoformat(timespec="seconds")
     base = {
         "storeId": app["storeId"],
         "name": app["name"],
@@ -217,10 +274,15 @@ def send_mail(subject, body):
 
 
 def main():
+    skip = throttled()
+    if skip:
+        print("[节流]", skip)
+        print("total: - online: - offline: - newly_down: - (本轮未核验)")
+        return
     apps_cfg = load_apps()
     prev = load_prev()
     meta = load_meta()
-    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(timespec="seconds")
+    now = now_cst().isoformat(timespec="seconds")
 
     apps = []
     newly_down = []

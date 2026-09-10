@@ -1,10 +1,17 @@
-name: 包体状态核验（每4小时）
+name: 包体状态核验
 
 on:
   schedule:
-    # 每 4 小时整点运行（GitHub cron 为 UTC 时间，即北京时间每 4 小时整点）：00/04/08/12/16/20 时（UTC），全天 6 次
-    - cron: '0 */4 * * *'
-  workflow_dispatch: {}   # 支持在 Actions 页面手动触发一次
+    # 每小时尝试一次。GitHub cron 不保证准点（实测会延迟 1~8 小时甚至跳过），
+    # 所以这里用「高频尝试 + 脚本内节流」换稳定性：真跑之前 check_status.py 会判断
+    # 距上次实际更新是否满 4 小时，未满则直接退出，因此对外表现的更新间隔仍是约 4 小时。
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '忽略 4 小时节流，强制执行一次核验'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -31,6 +38,10 @@ jobs:
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
+          # 手动触发且勾选 force 时跳过节流；定时触发恒为空，走节流判断
+          FORCE_CHECK: ${{ github.event.inputs.force }}
+          # 距上次实际更新不足该小时数则本轮跳过（默认 4 小时）
+          MIN_INTERVAL_HOURS: '4'
 
       - name: 提交更新（若数据有变化）
         run: |
