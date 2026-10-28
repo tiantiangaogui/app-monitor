@@ -478,7 +478,9 @@
   var FALLBACK_ANDROID = [
     {"packageName": "com.PokaLive", "bundleId": "com.PokaLive", "name": "PokaLive-Live Video Chat", "developer": "Pokalive.com", "genre": "Social", "releaseDate": "2021-07-25", "version": "1.56.0", "updatedDate": "2026-10-16", "installs": "1,000,000+", "score": 3.2, "ratings": 1186, "url": "https://play.google.com/store/apps/details?id=com.PokaLive", "icon": "https://play-lh.googleusercontent.com/KArmrakbbVUlhtmLYBhJ-ptdi4XeXgEAEVmDCiko9TymKD6_0nhT6kczHZJkvwU1xsAbBbMfUtfbLaVUHo6juw", "status": "online"},
     {"packageName": "com.nighttalk", "bundleId": "com.nighttalk", "name": "NightTalk", "developer": "Gato Technology Limited", "genre": "Social", "releaseDate": "2024-02-29", "version": "1.56.1", "updatedDate": "2026-10-14", "installs": "500,000+", "score": 3.2, "ratings": 1353, "url": "https://play.google.com/store/apps/details?id=com.nighttalk", "icon": "https://play-lh.googleusercontent.com/TvozIoix12SZ3cz7zUCZVT1V6M7q8rU4tPfR51ctlDJUa4LK_xuYr4OtPvrCjwlnimzT-ZuS7Y4S8DDpLfDJ", "status": "online"},
-    {"packageName": "com.vd.wherestart", "bundleId": "com.vd.wherestart", "name": "WhereStart", "developer": "ajeuuqoos apps", "genre": "Social", "releaseDate": "2023-08-22", "version": "1.56.0", "updatedDate": "2026-10-16", "installs": "100,000+", "score": 2.8, "ratings": 238, "url": "https://play.google.com/store/apps/details?id=com.vd.wherestart", "icon": "https://play-lh.googleusercontent.com/mAiupi3b-8lP4fz8--PLuURcu5vzUxWj98Wvqq8uGiyPXSdtnVtrJDXAcBwmHURRJA7JGUc2evFWEd9uWl8D", "status": "online"}
+    {"packageName": "com.vd.wherestart", "bundleId": "com.vd.wherestart", "name": "WhereStart", "developer": "ajeuuqoos apps", "genre": "Social", "releaseDate": "2023-08-22", "version": "1.56.0", "updatedDate": "2026-10-16", "installs": "100,000+", "score": 2.8, "ratings": 238, "url": "https://play.google.com/store/apps/details?id=com.vd.wherestart", "icon": "https://play-lh.googleusercontent.com/mAiupi3b-8lP4fz8--PLuURcu5vzUxWj98Wvqq8uGiyPXSdtnVtrJDXAcBwmHURRJA7JGUc2evFWEd9uWl8D", "status": "online"},
+    {"packageName": "com.fusionchat", "bundleId": "com.fusionchat", "name": "FusionChat", "developer": "Deb's Dev", "genre": "Social", "releaseDate": "2025-09-11", "version": "1.56.0", "updatedDate": "2026-10-26", "installs": "10,000+", "score": 3.2, "ratings": 143, "url": "https://play.google.com/store/apps/details?id=com.fusionchat", "icon": "https://play-lh.googleusercontent.com/rcT-FBeLZayc5Z8LfYsLfZQimpRCkw2LrwJj04akuh3WJwfDw2g6D4sT1c4gNgzB9yzNyDX3KLJk_hL9beG7lw", "status": "online"},
+    {"packageName": "com.uiz.buzzlink", "bundleId": "com.uiz.buzzlink", "name": "BuzzLink", "developer": "Gato2022", "genre": "Social", "releaseDate": "2026-08-24", "version": "Varies with device", "updatedDate": "", "installs": "100+", "score": null, "ratings": null, "url": "https://play.google.com/store/apps/details?id=com.uiz.buzzlink", "icon": "https://play-lh.googleusercontent.com/2330PuK8pkMze3mWFCHu_groG_ijp8F6ULqPcxAalKfktEX9yK5Wxziipfoz5cqcvXDXuoWgHw1uFQCyzUrcww", "status": "online"}
   ];
 
   var PLATFORM = "ios";
@@ -520,6 +522,12 @@
     return '<span class="st-cell unknown">' + UNKNOWN_ICON + '未确认</span>';
   }
 
+  // 数字版本号才加 v 前缀，Google Play 的「Varies with device」这类描述性文本原样展示
+  function verText(v) {
+    if (!v) return "–";
+    return /^\d/.test(v) ? "v" + v : v;
+  }
+
   function cardHTML(a) {
     var isAndroid = PLATFORM === "android";
     var pkg = a.packageName || a.bundleId || "";
@@ -551,7 +559,7 @@
           '<div class="row"><span class="k">主类型</span><span class="v">' + (a.genre || "–") + '</span></div>' +
           '<div class="row"><span class="k">开发者</span><span class="v">' + (a.developer || "–") + '</span></div>' +
           '<div class="row"><span class="k">上架日期</span><span class="v">' + (a.releaseDate || "–") + '</span></div>' +
-          '<div class="row"><span class="k">当前版本</span><span class="v">' + (a.version ? "v" + a.version : "–") + '</span></div>' +
+          '<div class="row"><span class="k">当前版本</span><span class="v">' + verText(a.version) + '</span></div>' +
           extraRows +
         '</div>' +
         (a.infoSnapshot
@@ -579,7 +587,7 @@
         '<td class="mono col-android">' + (pkg || "–") + '</td>' +
         '<td>' + (a.developer || "–") + '</td>' +
         '<td>' + (a.releaseDate || "–") + '</td>' +
-        '<td>' + (a.version ? "v" + a.version : "–") + '</td>' +
+        '<td>' + verText(a.version) + '</td>' +
         '<td class="col-android">' + (a.updatedDate || "–") + '</td>' +
         '<td class="col-android">' + (a.installs || "–") + '</td>' +
         '<td class="col-android">' + (a.score != null ? a.score + " / 5" : "–") + '</td>' +

@@ -19,5 +19,19 @@
     "country": "us",
     "lang": "en",
     "url": "https://play.google.com/store/apps/details?id=com.vd.wherestart"
+  },
+  {
+    "name": "FusionChat",
+    "packageName": "com.fusionchat",
+    "country": "us",
+    "lang": "en",
+    "url": "https://play.google.com/store/apps/details?id=com.fusionchat"
+  },
+  {
+    "name": "BuzzLink",
+    "packageName": "com.uiz.buzzlink",
+    "country": "us",
+    "lang": "en",
+    "url": "https://play.google.com/store/apps/details?id=com.uiz.buzzlink"
   }
 ]
