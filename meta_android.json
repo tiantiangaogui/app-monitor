@@ -9,7 +9,42 @@
       "releaseDate": "2021-07-25",
       "version": "1.56.0",
       "icon": "https://play-lh.googleusercontent.com/KArmrakbbVUlhtmLYBhJ-ptdi4XeXgEAEVmDCiko9TymKD6_0nhT6kczHZJkvwU1xsAbBbMfUtfbLaVUHo6juw",
-      "updatedAt": "2026-10-28T11:33:55+08:00"
+      "updatedDate": "2026-10-16",
+      "installs": "1,000,000+",
+      "score": 3.2,
+      "ratings": 1186,
+      "contentRating": "Mature 17+",
+      "updatedAt": "2026-10-28T11:44:16+08:00"
+    },
+    "com.nighttalk": {
+      "name": "NightTalk",
+      "developer": "Gato Technology Limited",
+      "packageName": "com.nighttalk",
+      "genre": "Social",
+      "releaseDate": "2024-02-29",
+      "version": "1.56.1",
+      "icon": "https://play-lh.googleusercontent.com/TvozIoix12SZ3cz7zUCZVT1V6M7q8rU4tPfR51ctlDJUa4LK_xuYr4OtPvrCjwlnimzT-ZuS7Y4S8DDpLfDJ",
+      "updatedDate": "2026-10-14",
+      "installs": "500,000+",
+      "score": 3.2,
+      "ratings": 1353,
+      "contentRating": "Mature 17+",
+      "updatedAt": "2026-10-28T11:44:19+08:00"
+    },
+    "com.vd.wherestart": {
+      "name": "WhereStart",
+      "developer": "ajeuuqoos apps",
+      "packageName": "com.vd.wherestart",
+      "genre": "Social",
+      "releaseDate": "2023-08-22",
+      "version": "1.56.0",
+      "icon": "https://play-lh.googleusercontent.com/mAiupi3b-8lP4fz8--PLuURcu5vzUxWj98Wvqq8uGiyPXSdtnVtrJDXAcBwmHURRJA7JGUc2evFWEd9uWl8D",
+      "updatedDate": "2026-10-16",
+      "installs": "100,000+",
+      "score": 2.8,
+      "ratings": 238,
+      "contentRating": "Mature 17+",
+      "updatedAt": "2026-10-28T11:44:22+08:00"
     }
   }
 }

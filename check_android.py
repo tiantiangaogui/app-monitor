@@ -103,6 +103,11 @@ def upsert_meta(meta, info):
         "releaseDate": info["releaseDate"],
         "version": info["version"],
         "icon": info["icon"],
+        "updatedDate": info.get("updatedDate", ""),
+        "installs": info.get("installs", ""),
+        "score": info.get("score"),
+        "ratings": info.get("ratings"),
+        "contentRating": info.get("contentRating", ""),
         "updatedAt": info["checkedAt"],
     }
 
@@ -179,8 +184,10 @@ def check_app(app, meta):
             base["status"] = "offline"
             snap = (meta.get("apps") or {}).get(pkg)
             if snap:
-                for k in ("developer", "genre", "releaseDate", "version", "icon"):
+                for k in ("developer", "genre", "releaseDate", "version", "icon", "updatedDate", "installs", "ratings", "contentRating"):
                     base[k] = snap.get(k, "")
+                snap_score = snap.get("score")
+                base["score"] = round(snap_score, 1) if isinstance(snap_score, (int, float)) else None
                 base["infoSnapshot"] = True
                 base["snapshotAt"] = snap.get("updatedAt", "")
             return base
@@ -195,7 +202,8 @@ def check_app(app, meta):
         base["icon"] = r.get("icon", "")
         base["updatedDate"] = to_iso_from_ts(r.get("updated"))
         base["installs"] = r.get("installs", "")
-        base["score"] = r.get("score")
+        raw_score = r.get("score")
+        base["score"] = round(raw_score, 1) if isinstance(raw_score, (int, float)) else None
         base["ratings"] = r.get("ratings")
         base["contentRating"] = r.get("contentRating", "")
         base["url"] = "https://play.google.com/store/apps/details?id=" + pkg
