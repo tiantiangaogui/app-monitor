@@ -1,0 +1,15 @@
+{
+  "_note": "Android 元数据快照库：记录每个包最后一次在线时的名称/开发者/包名/类型/上架日期/版本，供下架后兜底展示。",
+  "apps": {
+    "com.PokaLive": {
+      "name": "PokaLive-Live Video Chat",
+      "developer": "Pokalive.com",
+      "packageName": "com.PokaLive",
+      "genre": "Social",
+      "releaseDate": "2021-07-25",
+      "version": "1.56.0",
+      "icon": "https://play-lh.googleusercontent.com/KArmrakbbVUlhtmLYBhJ-ptdi4XeXgEAEVmDCiko9TymKD6_0nhT6kczHZJkvwU1xsAbBbMfUtfbLaVUHo6juw",
+      "updatedAt": "2026-10-28T11:29:54+08:00"
+    }
+  }
+}

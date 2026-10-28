@@ -1,0 +1,59 @@
+name: Android 包体状态核验（每日）
+
+# 与 iOS 的 update.yml 完全独立：
+# - iOS 每小时尝试 + 脚本内 4 小时节流
+# - Android 每天触发一次，脚本内 20 小时节流（留出 cron 延迟的容错）
+# 两条链路互不阻塞，Android 抓取失败不会影响 iOS 数据的更新。
+
+on:
+  schedule:
+    # UTC 02:00 = 北京时间 10:00，每天一次
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '忽略 20 小时节流，强制执行一次核验'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  check-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v5
+
+      - name: 配置 Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: 安装依赖
+        run: pip install google-play-scraper==1.2.7
+
+      - name: 运行 Android 状态检测
+        run: python check_android.py
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          FORCE_CHECK: ${{ github.event.inputs.force }}
+          MIN_INTERVAL_HOURS: '20'
+
+      - name: 提交更新（若数据有变化）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data_android.json meta_android.json
+          if git diff --cached --quiet; then
+            echo "data_android.json / meta_android.json 无变化，跳过提交"
+          else
+            git commit -m "chore: 更新 Android 包体状态 $(date -u +%F)"
+            git push
+            echo "已提交并推送最新 Android 状态数据"
+          fi

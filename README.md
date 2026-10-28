@@ -1,6 +1,6 @@
 # App 包体信息监控台
 
-一个会自动更新、部署在云端的 App 包体在线状态监控页。**每4小时自动核验** App Store 上各 App 的在线状态与包体信息，并把最新结果发布为网站；**发现 App 下架时自动发送邮件告警**。
+一个会自动更新、部署在云端的 App 包体在线状态监控页。iOS 包**每4小时自动核验** App Store，Android 包**每天自动核验一次** Google Play；发现包体下架时自动发送邮件告警。页面顶部可切换 iOS / Android 两个视图。
 
 ## 一、这个目录里有什么
 
@@ -12,10 +12,16 @@
 | `check_status.py` | 检测脚本：读 `apps.json`，调用 App Store 官方接口核验每个 App，生成 `data.json`；与上一轮对比识别"新下架"并发送邮件告警（纯标准库，跨平台） |
 | `data.json` | 最新一次核验结果，网站从它动态读取 |
 | `.github/workflows/update.yml` | 每4小时定时任务：自动运行检测脚本（含下架邮件通知）并把最新 `data.json` 推回仓库 |
+| `android_apps.json` | **Android 在管包清单**（包名 + 地区 + 语言） |
+| `check_android.py` | Android 检测脚本：查询 Google Play 生成 `data_android.json`，每天核验一次，带独立快照与告警 |
+| `data_android.json` | Android 最新核验结果，页面切到 Android 页签时读取 |
+| `meta_android.json` | Android 元数据快照，包下架后用于兜底展示 |
+| `.github/workflows/update_android.yml` | Android 每日定时任务，与 iOS 链路完全独立 |
 
 网站运行机制：
 - **自动模式**（部署后）：页面加载时读取 `data.json`，展示最近一次云端自动核验的结果与核验时间。
 - **手动模式**：页面右上角有「立即检测」按钮，点击后通过 App Store 官方接口即时刷新全部 App 的在线状态（无需后端，仅本次查看，不写入云端数据）。
+- **Android 模式**：顶部切到 Android 页签后读取 `data_android.json`，展示 Google Play 包的信息（含更新日期、下载量、评分）。该视图每天自动核验一次，不提供「立即检测」（Google Play 有 CORS 限制，只能经由 Actions 抓取）。
 - **本地预览**：直接用浏览器打开本地 `index.html`（file://）时无法读取 `data.json`，会展示内置数据快照，并提示部署后可自动更新。
 
 ## 二、云端部署步骤（约 5 分钟，全部免费）
