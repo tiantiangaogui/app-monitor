@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-28T11:44:16+08:00",
+  "checked_at": "2026-10-28T11:45:25+08:00",
   "apps": [
     {
       "storeId": "com.PokaLive",
@@ -7,7 +7,7 @@
       "name": "PokaLive-Live Video Chat",
       "url": "https://play.google.com/store/apps/details?id=com.PokaLive",
       "status": "online",
-      "checkedAt": "2026-10-28T11:44:16+08:00",
+      "checkedAt": "2026-10-28T11:45:25+08:00",
       "developer": "Pokalive.com",
       "bundleId": "com.PokaLive",
       "genre": "Social",
@@ -28,7 +28,7 @@
       "name": "NightTalk",
       "url": "https://play.google.com/store/apps/details?id=com.nighttalk",
       "status": "online",
-      "checkedAt": "2026-10-28T11:44:19+08:00",
+      "checkedAt": "2026-10-28T11:45:25+08:00",
       "developer": "Gato Technology Limited",
       "bundleId": "com.nighttalk",
       "genre": "Social",
@@ -49,7 +49,7 @@
       "name": "WhereStart",
       "url": "https://play.google.com/store/apps/details?id=com.vd.wherestart",
       "status": "online",
-      "checkedAt": "2026-10-28T11:44:22+08:00",
+      "checkedAt": "2026-10-28T11:45:25+08:00",
       "developer": "ajeuuqoos apps",
       "bundleId": "com.vd.wherestart",
       "genre": "Social",
