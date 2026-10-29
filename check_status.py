@@ -30,6 +30,14 @@ META_FILE = os.path.join(BASE_DIR, "meta.json")
 DEFAULT_MAIL_TO = ""
 
 
+def mask_mail(addr):
+    """日志只保留首字符与域名，避免 Actions 日志（公开可查）暴露完整收件地址"""
+    if "@" not in addr:
+        return "***"
+    local, domain = addr.split("@", 1)
+    return f"{local[:1]}***@{domain}"
+
+
 def load_apps():
     """从 apps.json 读取在管 App 清单（单一数据源，新增/删除 App 只需改这个文件）"""
     with open(CONFIG, encoding="utf-8") as f:
@@ -266,7 +274,7 @@ def send_mail(subject, body):
         server.login(user, pwd)
         server.sendmail(user, [to], msg.as_string())
         server.quit()
-        print("[邮件] 已发送下架通知 ->", to)
+        print("[邮件] 已发送下架通知 ->", mask_mail(to))
         return True
     except Exception as e:
         print("[邮件] 发送失败：", e)

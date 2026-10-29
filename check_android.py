@@ -32,6 +32,14 @@ DOWN_FILE = os.path.join(BASE_DIR, "down_android.json")
 DEFAULT_MAIL_TO = ""
 
 
+def mask_mail(addr):
+    """日志只保留首字符与域名，避免 Actions 日志（公开可查）暴露完整收件地址"""
+    if "@" not in addr:
+        return "***"
+    local, domain = addr.split("@", 1)
+    return f"{local[:1]}***@{domain}"
+
+
 def load_apps():
     with open(CONFIG, encoding="utf-8") as f:
         return json.load(f)
@@ -280,7 +288,7 @@ def send_mail(subject, body):
         server.login(user, pwd)
         server.sendmail(user, [to], msg.as_string())
         server.quit()
-        print("[邮件] 已发送安卓包下架通知 ->", to)
+        print("[邮件] 已发送安卓包下架通知 ->", mask_mail(to))
         return True
     except Exception as e:
         print("[邮件] 发送失败：", e)
