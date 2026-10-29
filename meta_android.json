@@ -14,7 +14,7 @@
       "score": 3.2,
       "ratings": 1186,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-10-28T13:45:49+08:00"
+      "updatedAt": "2026-10-29T15:57:09+08:00"
     },
     "com.nighttalk": {
       "name": "NightTalk",
@@ -22,14 +22,14 @@
       "packageName": "com.nighttalk",
       "genre": "Social",
       "releaseDate": "2024-02-29",
-      "version": "1.56.1",
+      "version": "1.56.2",
       "icon": "https://play-lh.googleusercontent.com/TvozIoix12SZ3cz7zUCZVT1V6M7q8rU4tPfR51ctlDJUa4LK_xuYr4OtPvrCjwlnimzT-ZuS7Y4S8DDpLfDJ",
-      "updatedDate": "2026-10-14",
+      "updatedDate": "2026-10-28",
       "installs": "500,000+",
       "score": 3.2,
       "ratings": 1353,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-10-28T13:45:49+08:00"
+      "updatedAt": "2026-10-29T15:57:09+08:00"
     },
     "com.vd.wherestart": {
       "name": "WhereStart",
@@ -44,7 +44,7 @@
       "score": 2.8,
       "ratings": 238,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-10-28T13:45:50+08:00"
+      "updatedAt": "2026-10-29T15:57:09+08:00"
     },
     "com.fusionchat": {
       "name": "FusionChat",
@@ -57,9 +57,9 @@
       "updatedDate": "2026-10-26",
       "installs": "10,000+",
       "score": 3.2,
-      "ratings": 143,
+      "ratings": 145,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-10-28T13:45:50+08:00"
+      "updatedAt": "2026-10-29T15:57:10+08:00"
     },
     "com.uiz.buzzlink": {
       "name": "BuzzLink",
@@ -74,7 +74,7 @@
       "score": null,
       "ratings": null,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-10-28T13:45:50+08:00"
+      "updatedAt": "2026-10-29T15:57:10+08:00"
     }
   }
 }
