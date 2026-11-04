@@ -40,5 +40,19 @@
     "country": "us",
     "lang": "en",
     "url": "https://play.google.com/store/apps/details?id=com.nighttalkpro"
+  },
+  {
+    "name": "PokaPlus-Live Video Chat",
+    "packageName": "com.pokaplus",
+    "country": "us",
+    "lang": "en",
+    "url": "https://play.google.com/store/apps/details?id=com.pokaplus"
+  },
+  {
+    "name": "Tikichat",
+    "packageName": "com.tikichat",
+    "country": "us",
+    "lang": "en",
+    "url": "https://play.google.com/store/apps/details?id=com.tikichat"
   }
 ]
