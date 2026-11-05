@@ -12,9 +12,9 @@
       "updatedDate": "2026-10-16",
       "installs": "1,000,000+",
       "score": 3.2,
-      "ratings": 1186,
+      "ratings": 1187,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-11-04T10:15:10+08:00"
+      "updatedAt": "2026-11-05T16:54:11+08:00"
     },
     "com.nighttalk": {
       "name": "NightTalk",
@@ -29,7 +29,7 @@
       "score": 3.2,
       "ratings": 1364,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-11-04T10:15:10+08:00"
+      "updatedAt": "2026-11-05T16:54:11+08:00"
     },
     "com.vd.wherestart": {
       "name": "WhereStart",
@@ -44,7 +44,7 @@
       "score": 2.8,
       "ratings": 241,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-11-04T10:15:11+08:00"
+      "updatedAt": "2026-11-05T16:54:11+08:00"
     },
     "com.fusionchat": {
       "name": "FusionChat",
@@ -59,7 +59,7 @@
       "score": 3.1,
       "ratings": 148,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-11-04T10:15:11+08:00"
+      "updatedAt": "2026-11-05T16:54:11+08:00"
     },
     "com.uiz.buzzlink": {
       "name": "BuzzLink",
@@ -68,13 +68,13 @@
       "genre": "Social",
       "releaseDate": "2026-08-24",
       "version": "Varies with device",
-      "icon": "https://play-lh.googleusercontent.com/2330PuK8pkMze3mWFCHu_groG_ijp8F6ULqPcxAalKfktEX9yK5Wxziipfoz5cqcvXDXuoWgHw1uFQCyzUrcww",
+      "icon": "https://play-lh.googleusercontent.com/88E72m_3WZbzm-0LKf_KO6On2vy2bVvkD4Q_clGYU7nvdSnbv4q-QyYy1xbErVV4e4xDwLLmlsDwErXES0huUw",
       "updatedDate": "",
       "installs": "100+",
       "score": null,
       "ratings": null,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-11-04T10:15:11+08:00"
+      "updatedAt": "2026-11-05T16:54:11+08:00"
     },
     "com.nighttalkpro": {
       "name": "NightTalk Pro",
@@ -87,9 +87,9 @@
       "updatedDate": "2026-10-27",
       "installs": "50,000+",
       "score": 3.1,
-      "ratings": 142,
+      "ratings": 143,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-11-04T10:15:12+08:00"
+      "updatedAt": "2026-11-05T16:54:11+08:00"
     },
     "com.pokaplus": {
       "name": "PokaPlus-Live Video Chat",
@@ -104,7 +104,7 @@
       "score": 3.4,
       "ratings": 389,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-11-04T10:15:12+08:00"
+      "updatedAt": "2026-11-05T16:54:11+08:00"
     },
     "com.tikichat": {
       "name": "Tikichat",
@@ -119,7 +119,7 @@
       "score": null,
       "ratings": null,
       "contentRating": "Mature 17+",
-      "updatedAt": "2026-11-04T10:15:12+08:00"
+      "updatedAt": "2026-11-05T16:54:11+08:00"
     }
   }
 }
