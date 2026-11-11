@@ -54,5 +54,12 @@
     "country": "us",
     "lang": "en",
     "url": "https://play.google.com/store/apps/details?id=com.tikichat"
+  },
+  {
+    "name": "LunaCall",
+    "packageName": "com.lunacall",
+    "country": "us",
+    "lang": "en",
+    "url": "https://play.google.com/store/apps/details?id=com.lunacall"
   }
 ]

@@ -9,6 +9,7 @@ Android 包体在线状态检测脚本（独立于 iOS 巡检链路）
 import datetime
 import json
 import os
+import re
 import smtplib
 import sys
 import time
@@ -28,6 +29,14 @@ OUTPUT = os.path.join(BASE_DIR, "data_android.json")
 CONFIG = os.path.join(BASE_DIR, "android_apps.json")
 META_FILE = os.path.join(BASE_DIR, "meta_android.json")
 DOWN_FILE = os.path.join(BASE_DIR, "down_android.json")
+INDEX_HTML = os.path.join(BASE_DIR, "index.html")
+
+# 写入 index.html 内置快照的字段顺序（与页面渲染所需字段一致）
+FALLBACK_KEYS = ("packageName", "bundleId", "name", "developer", "genre", "releaseDate",
+                 "version", "updatedDate", "installs", "score", "ratings", "url", "icon", "status")
+# 无法实时取数时，从"最后一次在线"的存档里回填的字段
+SNAPSHOT_FIELDS = ("developer", "genre", "releaseDate", "version", "icon",
+                   "updatedDate", "installs", "ratings", "contentRating")
 
 DEFAULT_MAIL_TO = ""
 
@@ -49,12 +58,14 @@ def now_cst():
     return datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
 
 
-def last_checked_at():
+def read_output():
+    """读取上一轮结果；文件缺失、损坏或结构不对时一律返回 None。"""
     if not os.path.exists(OUTPUT):
         return None
     try:
         with open(OUTPUT, encoding="utf-8") as f:
-            return json.load(f).get("checked_at")
+            d = json.load(f)
+        return d if isinstance(d.get("apps"), list) else None
     except Exception:
         return None
 
@@ -69,7 +80,7 @@ def throttled():
         interval = 24.0
     if interval <= 0:
         return None
-    raw = last_checked_at()
+    raw = (read_output() or {}).get("checked_at")
     if not raw:
         return None
     try:
@@ -162,18 +173,31 @@ def fetch_play(package, country, lang, attempts=3, delay=5):
     raise last_error or RuntimeError("Google Play 查询失败")
 
 
+def fill_from_snapshot(base, meta, pkg):
+    """下架或网络未确认时，用最后一次在线的存档回填展示字段，避免页面空白。"""
+    snap = (meta.get("apps") or {}).get(pkg)
+    if not snap:
+        return base
+    for k in SNAPSHOT_FIELDS:
+        base[k] = snap.get(k, "")
+    score = snap.get("score")
+    base["score"] = round(score, 1) if isinstance(score, (int, float)) else None
+    base["infoSnapshot"] = True
+    base["snapshotAt"] = snap.get("updatedAt", "")
+    return base
+
+
 def check_app(app, meta):
-    now = now_cst().isoformat(timespec="seconds")
     pkg = app["packageName"]
     base = {
         "storeId": pkg,
         "packageName": pkg,
-        "name": app["name"],
-        "url": app["url"],
-        "status": "unknown",
-        "checkedAt": now,
-        "developer": "",
         "bundleId": pkg,
+        "name": app.get("name") or pkg,
+        "url": app.get("url") or "https://play.google.com/store/apps/details?id=" + pkg,
+        "status": "unknown",
+        "checkedAt": now_cst().isoformat(timespec="seconds"),
+        "developer": "",
         "genre": "",
         "releaseDate": "",
         "version": "",
@@ -186,50 +210,59 @@ def check_app(app, meta):
         "infoSnapshot": False,
         "snapshotAt": "",
     }
+
+    # 只有 fetch_play 会抛异常：网络失败 → 未确认，绝不误判下架
     try:
         r = fetch_play(pkg, app.get("country", "us"), app.get("lang", "en"))
-        if r is None:
-            base["status"] = "offline"
-            snap = (meta.get("apps") or {}).get(pkg)
-            if snap:
-                for k in ("developer", "genre", "releaseDate", "version", "icon", "updatedDate", "installs", "ratings", "contentRating"):
-                    base[k] = snap.get(k, "")
-                snap_score = snap.get("score")
-                base["score"] = round(snap_score, 1) if isinstance(snap_score, (int, float)) else None
-                base["infoSnapshot"] = True
-                base["snapshotAt"] = snap.get("updatedAt", "")
-            return base
-        base["status"] = "online"
-        base["name"] = r.get("title") or app["name"]
-        base["developer"] = r.get("developer", "")
-        base["packageName"] = pkg
-        base["bundleId"] = pkg
-        base["genre"] = r.get("genre", "")
-        base["releaseDate"] = to_iso_date(r.get("released", ""))
-        base["version"] = r.get("version", "")
-        base["icon"] = r.get("icon", "")
-        base["updatedDate"] = to_iso_from_ts(r.get("updated"))
-        base["installs"] = r.get("installs", "")
-        raw_score = r.get("score")
-        base["score"] = round(raw_score, 1) if isinstance(raw_score, (int, float)) else None
-        base["ratings"] = r.get("ratings")
-        base["contentRating"] = r.get("contentRating", "")
-        base["url"] = "https://play.google.com/store/apps/details?id=" + pkg
-        return base
-    except Exception:
-        # 网络异常：保留未确认状态，不误报下架
-        base["status"] = "unknown"
-        return base
+    except Exception as e:
+        print("[未确认] %s 查询失败：%s: %s" % (pkg, type(e).__name__, e))
+        return fill_from_snapshot(base, meta, pkg)
+
+    if r is None:
+        base["status"] = "offline"
+        return fill_from_snapshot(base, meta, pkg)
+
+    base.update({
+        "status": "online",
+        "name": r.get("title") or base["name"],
+        "developer": r.get("developer", ""),
+        "genre": r.get("genre", ""),
+        "releaseDate": to_iso_date(r.get("released", "")),
+        "version": r.get("version", ""),
+        "icon": r.get("icon", ""),
+        "updatedDate": to_iso_from_ts(r.get("updated")),
+        "installs": r.get("installs", ""),
+        "score": round(r["score"], 1) if isinstance(r.get("score"), (int, float)) else None,
+        "ratings": r.get("ratings"),
+        "contentRating": r.get("contentRating", ""),
+    })
+    return base
 
 
-def load_prev():
-    if os.path.exists(OUTPUT):
-        try:
-            with open(OUTPUT, encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return None
-    return None
+def sync_fallback(apps):
+    """把本轮结果写进 index.html 的 FALLBACK_ANDROID；内容无变化时不写文件。
+
+    与 iOS 的 add_app.py 保持同一做法：清单 → 数据 → 兜底快照，单一数据源，
+    不再需要手工拼 JS 数组（漏逗号会让整页脚本失效）。
+    """
+    lines = []
+    for i, a in enumerate(apps):
+        obj = {k: a.get(k) for k in FALLBACK_KEYS}
+        comma = "," if i < len(apps) - 1 else ""
+        lines.append("    " + json.dumps(obj, ensure_ascii=False) + comma)
+    block = "var FALLBACK_ANDROID = [\n" + "\n".join(lines) + "\n  ];"
+
+    with open(INDEX_HTML, encoding="utf-8") as f:
+        html = f.read()
+    match = re.search(r"var FALLBACK_ANDROID = \[.*?\n  \];", html, re.S)
+    if not match:
+        print("[兜底] index.html 缺少 FALLBACK_ANDROID 定义，跳过同步")
+        return
+    if match.group(0) == block:
+        return
+    with open(INDEX_HTML, "w", encoding="utf-8", newline="\n") as f:
+        f.write(html[:match.start()] + block + html[match.end():])
+    print("[兜底] 已同步 index.html 内置快照（%d 个包）" % len(apps))
 
 
 def prev_status(prev, package):
@@ -285,9 +318,9 @@ def send_mail(subject, body):
         else:
             server = smtplib.SMTP(host, port, timeout=30)
             server.starttls()
-        server.login(user, pwd)
-        server.sendmail(user, [to], msg.as_string())
-        server.quit()
+        with server:
+            server.login(user, pwd)
+            server.sendmail(user, [to], msg.as_string())
         print("[邮件] 已发送安卓包下架通知 ->", mask_mail(to))
         return True
     except Exception as e:
@@ -302,7 +335,7 @@ def main():
         print("android total: - online: - offline: - newly_down: - (本轮未核验)")
         return
     apps_cfg = load_apps()
-    prev = load_prev()
+    prev = read_output()
     meta = load_meta()
     now = now_cst().isoformat(timespec="seconds")
 
@@ -322,6 +355,7 @@ def main():
     payload = {"checked_at": now, "apps": apps}
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+    sync_fallback(apps)
 
     if newly_down:
         with open(DOWN_FILE, "w", encoding="utf-8") as f:
